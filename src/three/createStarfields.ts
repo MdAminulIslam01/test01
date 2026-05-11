@@ -18,8 +18,8 @@ function createStarTexture() {
   const ctx = canvas.getContext('2d')!;
   const gradient = ctx.createRadialGradient(48, 48, 0, 48, 48, 48);
   gradient.addColorStop(0, 'rgba(255,255,255,1)');
-  gradient.addColorStop(0.18, 'rgba(205,229,255,0.8)');
-  gradient.addColorStop(0.55, 'rgba(112,159,255,0.18)');
+  gradient.addColorStop(0.12, 'rgba(255,249,235,0.72)');
+  gradient.addColorStop(0.34, 'rgba(170,190,230,0.14)');
   gradient.addColorStop(1, 'rgba(0,0,0,0)');
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, 96, 96);
@@ -82,7 +82,9 @@ function createSphericalPoints(count: number, minRadius: number, maxRadius: numb
     positions[i * 3 + 1] = radius * Math.cos(phi);
     positions[i * 3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
 
-    color.setHSL(randomBetween(0.56, 0.68), randomBetween(0.2, 0.75), randomBetween(0.55, 0.95));
+    const stellarType = Math.random();
+    const hue = stellarType < 0.62 ? randomBetween(0.08, 0.15) : randomBetween(0.55, 0.64);
+    color.setHSL(hue, randomBetween(0.04, 0.32), randomBetween(0.62, 0.96));
     colors[i * 3] = color.r;
     colors[i * 3 + 1] = color.g;
     colors[i * 3 + 2] = color.b;
@@ -122,7 +124,7 @@ function createMilkyWayPoints(count: number) {
     positions[i * 3 + 2] = Math.sin(angle) * radius + randomBetween(-spread, spread);
 
     const warmCore = Math.max(0, 1 - radius / 2_900);
-    color.setHSL(0.61 - warmCore * 0.5, 0.42 + warmCore * 0.2, 0.58 + Math.random() * 0.34);
+    color.setHSL(0.6 - warmCore * 0.48, 0.24 + warmCore * 0.18, 0.52 + Math.random() * 0.3);
     colors[i * 3] = color.r;
     colors[i * 3 + 1] = color.g;
     colors[i * 3 + 2] = color.b;
@@ -158,7 +160,7 @@ function createOrionArmPoints(count: number) {
     positions[i * 3 + 1] = randomBetween(-150, 150);
     positions[i * 3 + 2] = Math.sin(angle) * radius + randomBetween(-520, 520);
 
-    color.setHSL(randomBetween(0.57, 0.67), randomBetween(0.28, 0.72), randomBetween(0.52, 0.92));
+    color.setHSL(randomBetween(0.08, 0.65), randomBetween(0.08, 0.38), randomBetween(0.56, 0.9));
     colors[i * 3] = color.r;
     colors[i * 3 + 1] = color.g;
     colors[i * 3 + 2] = color.b;
@@ -322,7 +324,7 @@ function createCosmicWeb(count: number) {
     new THREE.LineSegments(
       new THREE.BufferGeometry().setFromPoints(linePoints),
       new THREE.LineBasicMaterial({
-        color: 0x7aa7ff,
+        color: 0xb8c8e8,
         transparent: true,
         opacity: 0,
         blending: THREE.AdditiveBlending,
@@ -370,11 +372,11 @@ function setObjectOpacity(group: THREE.Group, opacity: number) {
 
 export function createStarfieldSystem(): StarfieldSystem {
   const root = new THREE.Group();
-  const nearStars = createSphericalPoints(5_200, 90, 2_400, 3.8);
-  const localStars = createSphericalPoints(12_500, 1_900, 12_000, 7.2);
-  const interstellarMist = createSphericalPoints(9_000, 1_200, 5_600, 13);
+  const nearStars = createSphericalPoints(6_400, 90, 2_400, 2.2);
+  const localStars = createSphericalPoints(14_000, 1_900, 12_000, 4.8);
+  const interstellarMist = createSphericalPoints(7_000, 1_200, 5_600, 6.5);
   const orionArm = createOrionArmPoints(20_000);
-  const deepStars = createSphericalPoints(20_000, 10_000, 102_000, 24);
+  const deepStars = createSphericalPoints(22_000, 10_000, 102_000, 11);
   const milkyWay = createMilkyWayPoints(34_000);
   const localGroup = createLocalGroupGalaxies();
   const deepGalaxies = createDeepGalaxies(240);
@@ -393,19 +395,19 @@ export function createStarfieldSystem(): StarfieldSystem {
     deepGalaxies.rotation.y = -elapsed * 0.0008;
     cosmicWeb.rotation.y = elapsed * 0.00035;
 
-    setPointsOpacity(nearStars, Math.max(0.08, 1 - zoom * 0.13));
-    setPointsOpacity(localStars, rangeOpacity(zoom, 3.25, 3.75, 4.75, 5.35) * 0.95);
-    setPointsOpacity(interstellarMist, rangeOpacity(zoom, 2.75, 3.45, 4.5, 5.05) * 0.5);
-    setPointsOpacity(orionArm, rangeOpacity(zoom, 4.45, 5.05, 5.85, 6.45));
-    setPointsOpacity(deepStars, rangeOpacity(zoom, 5.4, 6.25, 8.05, 8.35) * 0.55 + bellOpacity(zoom, 8, 1.25) * 0.35);
+    setPointsOpacity(nearStars, Math.max(0.1, 0.82 - zoom * 0.11));
+    setPointsOpacity(localStars, rangeOpacity(zoom, 3.25, 3.75, 4.75, 5.35) * 0.68);
+    setPointsOpacity(interstellarMist, rangeOpacity(zoom, 2.75, 3.45, 4.5, 5.05) * 0.18);
+    setPointsOpacity(orionArm, rangeOpacity(zoom, 4.45, 5.05, 5.85, 6.45) * 0.76);
+    setPointsOpacity(deepStars, rangeOpacity(zoom, 5.4, 6.25, 8.05, 8.35) * 0.42 + bellOpacity(zoom, 8, 1.25) * 0.22);
 
     const milkyOpacity = rangeOpacity(zoom, 5.55, 6.1, 6.65, 7.08);
     setPointsOpacity(milkyWay, milkyOpacity);
     milkyWay.scale.setScalar(0.62 + zoom * 0.08);
 
-    setSpriteGroupOpacity(localGroup, rangeOpacity(zoom, 6.65, 7.05, 7.42, 7.78) * 0.88);
-    setSpriteGroupOpacity(deepGalaxies, rangeOpacity(zoom, 7.35, 7.78, 8.08, 8.35) * 0.82);
-    setObjectOpacity(cosmicWeb, rangeOpacity(zoom, 7.55, 7.9, 8.12, 8.4) * 0.5);
+    setSpriteGroupOpacity(localGroup, rangeOpacity(zoom, 6.65, 7.05, 7.42, 7.78) * 0.72);
+    setSpriteGroupOpacity(deepGalaxies, rangeOpacity(zoom, 7.35, 7.78, 8.08, 8.35) * 0.58);
+    setObjectOpacity(cosmicWeb, rangeOpacity(zoom, 7.55, 7.9, 8.12, 8.4) * 0.24);
   };
 
   const dispose = () => {

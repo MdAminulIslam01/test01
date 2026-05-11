@@ -189,7 +189,7 @@ function createAtmosphere(radius: number, color: THREE.ColorRepresentation, inte
         uniform vec3 glowColor;
         uniform float intensity;
         void main() {
-          float rim = pow(0.75 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
+          float rim = pow(0.58 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 3.2);
           gl_FragColor = vec4(glowColor, rim * intensity);
         }
       `,
@@ -213,7 +213,7 @@ function createOrbit(radius: number, color = 0x9ebcff) {
     new THREE.LineBasicMaterial({
       color,
       transparent: true,
-      opacity: 0.18,
+      opacity: 0.035,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     }),
@@ -288,8 +288,8 @@ export function createBodySystem(manager: THREE.LoadingManager): BodySystem {
     new THREE.MeshStandardMaterial({
       map: loadTexture(manager, TEXTURES.earth, ['#2d78ad', '#061a2d']),
       emissiveMap: loadTexture(manager, TEXTURES.earthNight, ['#050716', '#11172f']),
-      emissive: new THREE.Color(0x8aa8ff),
-      emissiveIntensity: 0.2,
+      emissive: new THREE.Color(0xffd6a0),
+      emissiveIntensity: 0.045,
       roughness: 0.82,
     }),
   );
@@ -301,14 +301,14 @@ export function createBodySystem(manager: THREE.LoadingManager): BodySystem {
     new THREE.MeshStandardMaterial({
       map: loadTexture(manager, TEXTURES.earthClouds, ['#ffffff', '#7892aa']),
       transparent: true,
-      opacity: 0.18,
+      opacity: 0.14,
       depthWrite: false,
       roughness: 0.65,
     }),
   );
   clouds.rotation.z = 0.41;
   earthMoon.add(clouds);
-  earthMoon.add(createAtmosphere(2.7, 0x6cb8ff, 0.5));
+  earthMoon.add(createAtmosphere(2.6, 0x9dccff, 0.18));
 
   const moonPivot = new THREE.Group();
   const moon = new THREE.Mesh(
@@ -322,7 +322,7 @@ export function createBodySystem(manager: THREE.LoadingManager): BodySystem {
   moonPivot.add(moon);
   earthMoon.add(moonPivot);
 
-  const moonOrbit = createOrbit(7.4, 0xb9c9e8);
+  const moonOrbit = createOrbit(7.4, 0x8fa8c6);
   earthMoon.add(moonOrbit);
 
   const solarSystem = new THREE.Group();
@@ -336,7 +336,7 @@ export function createBodySystem(manager: THREE.LoadingManager): BodySystem {
     }),
   );
   solarSystem.add(sun);
-  solarSystem.add(createAtmosphere(5.4, 0xffbc4a, 1.75));
+  solarSystem.add(createAtmosphere(5.15, 0xffb44c, 0.72));
   solarSystem.add(new THREE.PointLight(0xffd391, 30, 1_100, 1.35));
 
   const planetRecords = PLANETS.map((spec) => createPlanet(manager, spec));

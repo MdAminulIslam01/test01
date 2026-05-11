@@ -28,14 +28,7 @@ function createSpaceDome() {
       fragmentShader: `
         varying vec3 vWorld;
         void main() {
-          float horizon = pow(1.0 - abs(vWorld.y), 2.4);
-          float deepGlow = 0.18 + horizon * 0.34;
-          vec3 black = vec3(0.003, 0.006, 0.026);
-          vec3 blue = vec3(0.012, 0.025, 0.065);
-          vec3 violet = vec3(0.026, 0.018, 0.048);
-          vec3 color = mix(black, blue, deepGlow);
-          color += violet * pow(max(0.0, vWorld.x * 0.45 + vWorld.z * 0.28), 2.0) * 0.18;
-          gl_FragColor = vec4(color, 1.0);
+          gl_FragColor = vec4(vec3(0.0), 1.0);
         }
       `,
       side: THREE.BackSide,
@@ -78,10 +71,10 @@ export class UniverseScene {
       alpha: false,
       powerPreference: 'high-performance',
     });
-    this.renderer.setClearColor(0x000107, 1);
+    this.renderer.setClearColor(0x000000, 1);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.18;
+    this.renderer.toneMappingExposure = 0.95;
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.mount.appendChild(this.renderer.domElement);
 
@@ -95,14 +88,14 @@ export class UniverseScene {
 
     this.composer = new EffectComposer(this.renderer);
     this.composer.addPass(new RenderPass(this.scene, this.camera));
-    this.bloomPass = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.5, 0.48, 0.14);
+    this.bloomPass = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.28, 0.42, 0.2);
     this.composer.addPass(this.bloomPass);
     this.composer.addPass(new OutputPass());
 
     this.spaceDome.renderOrder = -100;
     this.scene.add(this.spaceDome);
-    this.scene.add(new THREE.AmbientLight(0x4d618e, 0.18));
-    const keyLight = new THREE.DirectionalLight(0xbfd8ff, 2.5);
+    this.scene.add(new THREE.AmbientLight(0xffffff, 0.035));
+    const keyLight = new THREE.DirectionalLight(0xfff6df, 2.35);
     keyLight.position.set(-7, 5, 8);
     this.scene.add(keyLight);
     this.bodySystem = createBodySystem(this.loadingManager);
@@ -162,7 +155,7 @@ export class UniverseScene {
     this.lowFpsSeconds = fps < 34 ? this.lowFpsSeconds + delta : Math.max(0, this.lowFpsSeconds - delta);
     if (this.lowFpsSeconds > 2.5) {
       this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.35));
-      this.bloomPass.strength = 0.52;
+      this.bloomPass.strength = 0.24;
     }
   }
 
