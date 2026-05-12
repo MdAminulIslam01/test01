@@ -18,8 +18,9 @@ function createStarTexture() {
   const ctx = canvas.getContext('2d')!;
   const gradient = ctx.createRadialGradient(48, 48, 0, 48, 48, 48);
   gradient.addColorStop(0, 'rgba(255,255,255,1)');
-  gradient.addColorStop(0.12, 'rgba(255,249,235,0.72)');
-  gradient.addColorStop(0.34, 'rgba(170,190,230,0.14)');
+  gradient.addColorStop(0.13, 'rgba(255,250,236,0.86)');
+  gradient.addColorStop(0.38, 'rgba(180,204,255,0.22)');
+  gradient.addColorStop(0.72, 'rgba(88,126,210,0.055)');
   gradient.addColorStop(1, 'rgba(0,0,0,0)');
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, 96, 96);
@@ -69,7 +70,7 @@ function createGalaxyTexture(colorA = '#dce9ff', colorB = '#ffbe78') {
   return texture;
 }
 
-function createSphericalPoints(count: number, minRadius: number, maxRadius: number, size: number) {
+function createSphericalPoints(count: number, minRadius: number, maxRadius: number, size: number, sizeAttenuation = true) {
   const positions = new Float32Array(count * 3);
   const colors = new Float32Array(count * 3);
   const color = new THREE.Color();
@@ -84,7 +85,7 @@ function createSphericalPoints(count: number, minRadius: number, maxRadius: numb
 
     const stellarType = Math.random();
     const hue = stellarType < 0.62 ? randomBetween(0.08, 0.15) : randomBetween(0.55, 0.64);
-    color.setHSL(hue, randomBetween(0.04, 0.32), randomBetween(0.62, 0.96));
+    color.setHSL(hue, randomBetween(0.04, 0.34), randomBetween(0.72, 1));
     colors[i * 3] = color.r;
     colors[i * 3 + 1] = color.g;
     colors[i * 3 + 2] = color.b;
@@ -101,7 +102,7 @@ function createSphericalPoints(count: number, minRadius: number, maxRadius: numb
     opacity: 1,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
-    sizeAttenuation: true,
+    sizeAttenuation,
   });
 
   return new THREE.Points(geometry, material);
@@ -372,11 +373,11 @@ function setObjectOpacity(group: THREE.Group, opacity: number) {
 
 export function createStarfieldSystem(): StarfieldSystem {
   const root = new THREE.Group();
-  const nearStars = createSphericalPoints(6_400, 90, 2_400, 2.2);
-  const localStars = createSphericalPoints(14_000, 1_900, 12_000, 4.8);
-  const interstellarMist = createSphericalPoints(7_000, 1_200, 5_600, 6.5);
+  const nearStars = createSphericalPoints(9_200, 85, 1_850, 1.65, false);
+  const localStars = createSphericalPoints(16_500, 1_900, 12_000, 5.4);
+  const interstellarMist = createSphericalPoints(8_400, 1_200, 5_600, 7.2);
   const orionArm = createOrionArmPoints(20_000);
-  const deepStars = createSphericalPoints(22_000, 10_000, 102_000, 11);
+  const deepStars = createSphericalPoints(25_000, 10_000, 102_000, 12.5);
   const milkyWay = createMilkyWayPoints(34_000);
   const localGroup = createLocalGroupGalaxies();
   const deepGalaxies = createDeepGalaxies(240);
@@ -395,19 +396,19 @@ export function createStarfieldSystem(): StarfieldSystem {
     deepGalaxies.rotation.y = -elapsed * 0.0008;
     cosmicWeb.rotation.y = elapsed * 0.00035;
 
-    setPointsOpacity(nearStars, Math.max(0.1, 0.82 - zoom * 0.11));
-    setPointsOpacity(localStars, rangeOpacity(zoom, 3.25, 3.75, 4.75, 5.35) * 0.68);
-    setPointsOpacity(interstellarMist, rangeOpacity(zoom, 2.75, 3.45, 4.5, 5.05) * 0.18);
-    setPointsOpacity(orionArm, rangeOpacity(zoom, 4.45, 5.05, 5.85, 6.45) * 0.76);
-    setPointsOpacity(deepStars, rangeOpacity(zoom, 5.4, 6.25, 8.05, 8.35) * 0.42 + bellOpacity(zoom, 8, 1.25) * 0.22);
+    setPointsOpacity(nearStars, Math.max(0.22, 0.95 - zoom * 0.095));
+    setPointsOpacity(localStars, rangeOpacity(zoom, 3.1, 3.65, 4.85, 5.45) * 0.86);
+    setPointsOpacity(interstellarMist, rangeOpacity(zoom, 2.55, 3.25, 4.65, 5.2) * 0.3);
+    setPointsOpacity(orionArm, rangeOpacity(zoom, 4.35, 4.95, 5.95, 6.55) * 0.92);
+    setPointsOpacity(deepStars, rangeOpacity(zoom, 5.25, 6.05, 8.1, 8.38) * 0.58 + bellOpacity(zoom, 8, 1.35) * 0.3);
 
     const milkyOpacity = rangeOpacity(zoom, 5.55, 6.1, 6.65, 7.08);
     setPointsOpacity(milkyWay, milkyOpacity);
     milkyWay.scale.setScalar(0.62 + zoom * 0.08);
 
-    setSpriteGroupOpacity(localGroup, rangeOpacity(zoom, 6.65, 7.05, 7.42, 7.78) * 0.72);
-    setSpriteGroupOpacity(deepGalaxies, rangeOpacity(zoom, 7.35, 7.78, 8.08, 8.35) * 0.58);
-    setObjectOpacity(cosmicWeb, rangeOpacity(zoom, 7.55, 7.9, 8.12, 8.4) * 0.24);
+    setSpriteGroupOpacity(localGroup, rangeOpacity(zoom, 6.55, 6.98, 7.46, 7.84) * 0.84);
+    setSpriteGroupOpacity(deepGalaxies, rangeOpacity(zoom, 7.25, 7.7, 8.12, 8.38) * 0.72);
+    setObjectOpacity(cosmicWeb, rangeOpacity(zoom, 7.5, 7.86, 8.15, 8.42) * 0.34);
   };
 
   const dispose = () => {

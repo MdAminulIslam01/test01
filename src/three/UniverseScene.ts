@@ -28,7 +28,12 @@ function createSpaceDome() {
       fragmentShader: `
         varying vec3 vWorld;
         void main() {
-          gl_FragColor = vec4(vec3(0.0), 1.0);
+          float horizon = smoothstep(-0.85, 0.75, vWorld.y);
+          float centerGlow = pow(max(0.0, 1.0 - abs(vWorld.y) * 0.75), 2.2);
+          vec3 zenith = vec3(0.003, 0.007, 0.018);
+          vec3 horizonColor = vec3(0.012, 0.018, 0.04);
+          vec3 color = mix(horizonColor, zenith, horizon) + vec3(0.008, 0.011, 0.022) * centerGlow;
+          gl_FragColor = vec4(color, 1.0);
         }
       `,
       side: THREE.BackSide,
@@ -74,7 +79,7 @@ export class UniverseScene {
     this.renderer.setClearColor(0x000000, 1);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 0.95;
+    this.renderer.toneMappingExposure = 1.08;
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.mount.appendChild(this.renderer.domElement);
 
@@ -88,7 +93,7 @@ export class UniverseScene {
 
     this.composer = new EffectComposer(this.renderer);
     this.composer.addPass(new RenderPass(this.scene, this.camera));
-    this.bloomPass = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.28, 0.42, 0.2);
+    this.bloomPass = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.34, 0.46, 0.16);
     this.composer.addPass(this.bloomPass);
     this.composer.addPass(new OutputPass());
 
@@ -155,7 +160,7 @@ export class UniverseScene {
     this.lowFpsSeconds = fps < 34 ? this.lowFpsSeconds + delta : Math.max(0, this.lowFpsSeconds - delta);
     if (this.lowFpsSeconds > 2.5) {
       this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.35));
-      this.bloomPass.strength = 0.24;
+      this.bloomPass.strength = 0.28;
     }
   }
 
